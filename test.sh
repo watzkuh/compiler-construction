@@ -35,29 +35,29 @@ d := a + b * c
 d
 EOF
 
-./calc++ input
+./go input
 
-echo && echo -e "\nTEST: Running the same four line cac++ program with input from a pipe (stdin)..."
-cat input | ./calc++ -
+echo && echo -e "\nTEST: Running the same four line go program with input from a pipe (stdin)..."
+cat input | ./go -
 
-echo && echo -e "\nTEST: Running the same four line cac++ program with parse tracing turned on..."
-./calc++ -p input
+echo && echo -e "\nTEST: Running the same four line go program with parse tracing turned on..."
+./go -p input
 
 
 
-echo && echo -e "\nTEST: Running a cac++ program with undefined variables..."
+echo && echo -e "\nTEST: Running a go program with undefined variables..."
 cat >input <<EOF
 a := 1
 d := a + b * c
 EOF
-./calc++ input
+./go input
 
-echo && echo -e "\nTEST: Running a cac++ program with scanner (lexer) tracing turned on..."
+echo && echo -e "\nTEST: Running a go program with scanner (lexer) tracing turned on..."
 cat >input <<EOF
 toto := 1
 toto
 EOF
-./calc++ -s input
+./go -s input
 
 
 rm input

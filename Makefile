@@ -27,26 +27,26 @@ YFLAGS=-v -d
 # Wo   -d wichtig ist, weil damit Header-Dateien erzeugt werden
 #         (*.hh - und nicht nur Quellcode in *.cc)
 # aber -v nicht so wichtig ist, weil damit "nur" die  Datei
-#         calc++-parser.output erzeugt wird, die zwar informativ aber nicht
+#         go-parser.output erzeugt wird, die zwar informativ aber nicht
 #         unbedingt notwendig (sie wird nicht weiterverwendet).
 
-HEADERS=calc++-parser.hh calc++-scanner.hh
+HEADERS=go-parser.hh go-scanner.hh
 
-calc++ : calc++.o calc++-scanner.o calc++-parser.o calc++-driver.o
+go : go.o go-scanner.o go-parser.o go-driver.o
 
-calc++.o : calc++.cc calc++-driver.hh calc++-parser.hh
+go.o : go.cc go-driver.hh go-parser.hh Node.hh
 
 %.o: %.cc
 	$(CC) $(CFLAGS) -o $@ -c $<
 
-calc++-scanner.cc: calc++-scanner.ll
-	$(LEX) $(LFLAGS) -o calc++-scanner.cc calc++-scanner.ll
+go-scanner.cc: go-scanner.ll
+	$(LEX) $(LFLAGS) -o go-scanner.cc go-scanner.ll
 
-calc++-parser.cc calc++-parser.hh: calc++-parser.yy
-	$(YACC) $(YFLAGS) -o calc++-parser.cc calc++-parser.yy
+go-parser.cc go-parser.hh: go-parser.yy
+	$(YACC) $(YFLAGS) -o go-parser.cc go-parser.yy
 
 clean:
-	$(RM) *~ *.o  calc++  calc++-scanner.cc calc++-parser.cc  calc++-scanner.hh calc++-parser.hh calc++-parser.output location.hh stack.hh position.hh
+	$(RM) *~ *.o  go  go-scanner.cc go-parser.cc  go-scanner.hh go-parser.hh go-parser.output location.hh stack.hh position.hh
 
-tests: test.sh calc++
+tests: test.sh go
 	./test.sh
