@@ -24,7 +24,7 @@
 %code requires
 {
 # include <string>
-
+class Node;
 class go_driver;
 }
 
@@ -59,42 +59,40 @@ class go_driver;
 
 %token <std::string> ID "identifier"
 %token <std::string> LITSTRING "string literal"
-%type<Node*> unit
-%type<Node*> package_clause
-%type<Node*> import_clause
-%type<Node*> import_list_entry
+%type<Node*> unit package_clause import_clause import_list_entry
+
 %printer { yyoutput << $$; } <*>;
 
 %%
 %start unit;
-unit: package_clause import_clause{
+unit: 				package_clause import_clause{
 					Node *tmp = new Node("sourcefile");
 					tmp->addChild($1);
 					tmp->addChild($2);
 					driver.root = tmp;
 };
 
-package_clause:	PACKAGE ID SEMICOLON{
+package_clause:		PACKAGE ID SEMICOLON{
 					Node *tmp = new Node("package_clause");
 					tmp->addChild(new Node("id"));
 					$$ = tmp;
 };
 
-import_clause:	%empty
-				|IMPORT LITSTRING SEMICOLON import_clause{
-					Node *tmp = new Node("import_clause");
-					tmp->addChild(new Node("litString"));
-					tmp->addChild($4);
-					$$ = tmp;
-				}
-				|IMPORT PARL import_list_entry PARR import_clause{
-					Node *tmp = new Node("import_clause");
-					tmp->addChild($3);
-					tmp->addChild($5);
-					$$ = tmp;
-				};
+import_clause:		%empty {$$ = nullptr;}
+					|IMPORT LITSTRING SEMICOLON import_clause{
+						Node *tmp = new Node("import_clause");
+						tmp->addChild(new Node("litString"));
+						tmp->addChild($4);
+						$$ = tmp;
+					}
+					|IMPORT PARL import_list_entry PARR import_clause{
+						Node *tmp = new Node("import_clause");
+						tmp->addChild($3);
+						tmp->addChild($5);
+						$$ = tmp;
+					};
 
-import_list_entry:	%empty 
+import_list_entry:	%empty {$$ = nullptr;}
 					|LITSTRING SEMICOLON import_list_entry{
 						Node *tmp = new Node("import_list_entry");
 						tmp->addChild(new Node("litString"));

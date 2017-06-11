@@ -32,9 +32,9 @@ YFLAGS=-v -d
 
 HEADERS=go-parser.hh go-scanner.hh
 
-go : go.o go-scanner.o go-parser.o go-driver.o
+#go : go.o go-scanner.o go-parser.o go-driver.o
 
-go.o : go.cc go-driver.hh go-parser.hh Node.hh
+go : go.cc go-driver.cc go-parser.cc go-scanner.cc Node.cc
 
 %.o: %.cc
 	$(CC) $(CFLAGS) -o $@ -c $<

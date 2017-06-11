@@ -2,6 +2,7 @@
 # define NODE_HH
 #include "vector"
 #include <string>
+#include <iostream>
 class Node{
 private:
 	std::string val;
