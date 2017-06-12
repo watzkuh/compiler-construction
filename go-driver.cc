@@ -21,7 +21,8 @@ go_driver::parse (const std::string &f)
   parser.set_debug_level (trace_parsing);
   int res = parser.parse ();
   scan_end ();
-  this->root->print(0);
+  if(this->root != nullptr)
+	this->root->print(0);
   return res;
 }
 

@@ -53,22 +53,47 @@ class go_driver;
   SEMICOLON  ";"
   IMPORT   "import"
   PACKAGE    "package"
+  PLUS	"+"
+  MINUS	"-"
+  MUL	"*"
+  DIV	"/"
+  EQUALS	"="
+  DOT	"."
+  COMMA ","
   PARL  "("
   PARR  ")"
+  CURL	"{"
+  CURR	"}"
+  VAR	"var"
+  TYPEINT "int"
+  TYPEFLOAT "float"
+  TYPERUNE	"rune"
+  TYPEBOOL	"bool"
+  TYPESTRING "string"
+  FUNC	"func"
 ;
-
+%left PLUS MINUS;
+%left MUL DIV;
 %token <std::string> ID "identifier"
 %token <std::string> LITSTRING "string literal"
-%type<Node*> unit package_clause import_clause import_list_entry
-
+%token <std::string> LITINT "integer literal"
+%token <std::string> LITFLOAT "float literal"
+%token <std::string> LITRUNE "rune literal"
+%token <std::string> LITBOOL "bool literal"
+%type<Node*> unit package_clause import_clause import_list_entry 
+top_level_declaration var_declaration func_declaration 
+type para_signature  return_signature statement_list expression
+function_call exp parameter_list lit
+;
 %printer { yyoutput << $$; } <*>;
 
 %%
 %start unit;
-unit: 				package_clause import_clause{
+unit: 				package_clause import_clause top_level_declaration{
 					Node *tmp = new Node("sourcefile");
 					tmp->addChild($1);
 					tmp->addChild($2);
+					tmp->addChild($3);
 					driver.root = tmp;
 };
 
@@ -100,7 +125,138 @@ import_list_entry:	%empty {$$ = nullptr;}
 						$$ = tmp;
 						};
 
+top_level_declaration:	%empty {$$ = nullptr;}
+					|var_declaration top_level_declaration {
+						Node *tmp = new Node("top_level_declaration");
+						tmp->addChild($1);
+						tmp->addChild($2);
+						$$ = tmp;
+					}
+					|func_declaration top_level_declaration {
+						Node *tmp = new Node("top_level_declaration");
+						tmp->addChild($1);
+						tmp->addChild($2);
+						$$ = tmp;
+					};
+var_declaration:	VAR ID type SEMICOLON{
+						Node *tmp = new Node("var_declaration");
+						tmp->addChild(new Node("id"));
+						tmp->addChild($3);
+						$$ = tmp;
+					};
+func_declaration:	FUNC ID PARL para_signature PARR return_signature CURL statement_list CURR{ 
+						Node *tmp = new Node("func_declaration");
+						tmp->addChild(new Node("id"));
+						tmp->addChild($4);
+						tmp->addChild($6);
+						tmp->addChild($8);
+						$$ = tmp;
+					};
+					//TODO: FILL UP WITH FUNCTIONALITY
+return_signature:	%empty {$$ = nullptr;};
+para_signature:		%empty {$$ = nullptr;};					
+statement_list:		%empty {$$ = nullptr;}
+					|var_declaration statement_list{
+						Node *tmp = new Node("statement_list");
+						tmp->addChild($1);
+						tmp->addChild($2);
+						$$ = tmp;
+					}
+					|expression statement_list{
+						Node *tmp = new Node("statement_list");
+						tmp->addChild($1);
+						tmp->addChild($2);
+						$$ = tmp;
+					};
 					
+expression:			function_call SEMICOLON{
+						Node *tmp = new Node("expression");
+						tmp->addChild(new Node("id"));
+						tmp->addChild($1);
+						$$ = tmp;
+					}
+					|ID EQUALS exp SEMICOLON{
+						Node *tmp = new Node("expression");
+						tmp->addChild(new Node("id"));
+						tmp->addChild($3);
+						$$ = tmp;
+					};
+function_call:		ID DOT ID PARL parameter_list PARR{
+						Node *tmp = new Node("function_call");
+						tmp->addChild(new Node("id"));
+						tmp->addChild($5);
+						$$ = tmp;
+					};
+parameter_list:		%empty{$$ = nullptr;}
+					|exp COMMA parameter_list
+					|exp;
+
+exp:				exp PLUS exp   { 
+						Node *tmp = new Node("addition");
+						tmp->addChild($1);
+						tmp->addChild($3);
+						$$ = tmp;
+					}
+					| exp MINUS exp   {
+						Node *tmp = new Node("subtraction");
+						tmp->addChild($1);
+						tmp->addChild($3);
+						$$ = tmp;
+					}
+					| exp MUL exp   { 
+						Node *tmp = new Node("multiplication");
+						tmp->addChild($1);
+						tmp->addChild($3);
+						$$ = tmp ;
+					}
+					| exp DIV exp   {
+						Node *tmp = new Node("division");
+						tmp->addChild($1);
+						tmp->addChild($3);
+						$$ = tmp;
+					}
+					| PARL exp PARR   { 
+						Node *tmp = new Node("sub exp");
+						tmp->addChild($2);
+						$$ = tmp;
+					}
+					| ID  { $$ = new Node("id"); }
+					| lit  {
+						$$ = $1;
+					}
+					|function_call{
+						$$ = $1;
+					};
+lit:				LITINT{
+						$$ = new Node("int lit");
+					}
+					|LITFLOAT{
+						$$ = new Node("float lit");
+					}
+					|LITRUNE{
+						$$ = new Node("rune lit");
+					}
+					|LITBOOL{
+						$$ = new Node("bool lit");
+					}
+					|LITSTRING{
+						$$ = new Node("string lit");
+					};
+type:				TYPEINT{
+						$$ = new Node("int");
+					}
+					|TYPEFLOAT{
+						$$ = new Node("float");
+					}
+					|TYPERUNE{
+						$$ = new Node("rune");
+					}
+					|TYPEBOOL{
+						$$ = new Node("bool");
+					}
+					|TYPESTRING{
+						$$ = new Node("string");
+					};
 %%
 
 void yy::go_parser::error (const location_type& l,

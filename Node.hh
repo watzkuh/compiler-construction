@@ -5,11 +5,12 @@
 #include <iostream>
 class Node{
 private:
-	std::string val;
+	
 	std::vector<Node*>* children;
 public:
 	Node();
 	Node(std::string val);
+	std::string val;
 	void addChild(Node* child);
 	void print(int depth);
 };

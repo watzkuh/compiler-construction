@@ -12,8 +12,8 @@ import(
 var a int;
 func main() {
 	var b string;
+	a.b();
+	x = (4.4*4.1 + 5)/math.pi();
 	fmt.PrintLn();
-	3.14 * 2.718;
-	a = 20 * 10 + b;
-	a = 20 * (10 + b);
+	
 }

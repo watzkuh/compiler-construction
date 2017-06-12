@@ -1,7 +1,6 @@
 package main;
-import fmt;
+import fmt";
 
-var a int;
 func main() {
-	var b string;
+	a = 1+4;
 }

@@ -49,4 +49,4 @@ clean:
 	$(RM) *~ *.o  go  go-scanner.cc go-parser.cc  go-scanner.hh go-parser.hh go-parser.output location.hh stack.hh position.hh
 
 tests: test.sh go
-	./test.sh
+	./test/test.sh

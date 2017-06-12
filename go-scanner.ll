@@ -52,10 +52,31 @@ letter	[a-zA-Z]
 [\n]+      loc.lines (yyleng); loc.step ();
 "package"      return yy::go_parser::make_PACKAGE(loc);
 "import"      return yy::go_parser::make_IMPORT(loc);
+"func"		return yy::go_parser::make_FUNC(loc);
+"."		return yy::go_parser::make_DOT(loc);
+","		return yy::go_parser::make_COMMA(loc);
+"+"		return yy::go_parser::make_PLUS(loc);
+"-"		return yy::go_parser::make_MINUS(loc);
+"*"		return yy::go_parser::make_MUL(loc);
+"/"		return yy::go_parser::make_DIV(loc);
+"="		return yy::go_parser::make_EQUALS(loc);
 ";"      return yy::go_parser::make_SEMICOLON(loc);
 "("      return yy::go_parser::make_PARL(loc);
 ")"      return yy::go_parser::make_PARR(loc);
+"{"		return yy::go_parser::make_CURL(loc);
+"}"		return yy::go_parser::make_CURR(loc);
+"var"		return yy::go_parser::make_VAR(loc);
+"int"		return yy::go_parser::make_TYPEINT(loc);
+"float"		return yy::go_parser::make_TYPEFLOAT(loc);
+"rune"		return yy::go_parser::make_TYPERUNE(loc);
+"bool"		return yy::go_parser::make_TYPEBOOL(loc);
+"string"	return yy::go_parser::make_TYPESTRING(loc);
+
 {letter}({letter}|{digit})*	return yy::go_parser::make_ID(yytext, loc);
+{digit}+					{return yy::go_parser::make_LITINT(yytext, loc);}
+{digit}+"."{digit}+			{return yy::go_parser::make_LITFLOAT(yytext, loc);}
+"'"(letter|digit)"'"		{return yy::go_parser::make_LITRUNE(yytext, loc);}
+["true""false"]				{return yy::go_parser::make_LITBOOL(yytext, loc);}
 \"({letter}|{digit})*\"	return yy::go_parser::make_LITSTRING(yytext, loc);
 
 
