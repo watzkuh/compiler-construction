@@ -7,5 +7,3 @@ do
   # take action on each file. $f store current file name
   ./go $f
 done
-
-read -p "Press enter to continue"

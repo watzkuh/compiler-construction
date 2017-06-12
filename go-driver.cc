@@ -1,17 +1,28 @@
 #include "go-driver.hh"
 #include "go-parser.hh"
 
+std::vector<std::string> *Node::symbolTable;
+
 go_driver::go_driver ()
   : trace_scanning (false), trace_parsing (false)
 {
-  variables["one"] = 1;
-  variables["two"] = 2;
+   this->symbolTable = new std::vector<std::string>;
+   Node::symbolTable = this->symbolTable;
 }
 
 go_driver::~go_driver ()
 {
 }
 
+int go_driver::addToSymbolTable(std::string val){
+	this->symbolTable->push_back(val);
+	return (symbolTable->size())-1;
+}
+void go_driver::printSymbolTable(){
+	for(auto entry = symbolTable->begin(); entry != symbolTable->end(); ++entry){
+		std::cout<<(*entry)<<std::endl;
+	}
+}
 int
 go_driver::parse (const std::string &f)
 {

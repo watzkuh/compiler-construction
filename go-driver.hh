@@ -1,7 +1,7 @@
 #ifndef GO_DRIVER_HH
 # define GO_DRIVER_HH
 # include <string>
-# include <map>
+# include <vector>
 # include "go-parser.hh"
 # include "Node.hh"
 // Tell Flex the lexer's prototype ...
@@ -13,14 +13,17 @@ YY_DECL;
 // Conducting the whole scanning and parsing of Calc++.
 class go_driver
 {
+private:
+  std::vector<std::string>* symbolTable;
 public:
   go_driver ();
   virtual ~go_driver ();
   Node* root;
-  std::map<std::string, int> variables;
 
   int result;
 
+  int addToSymbolTable(std::string);
+  void printSymbolTable();
   // Handling the scanner.
   void scan_begin ();
   void scan_end ();

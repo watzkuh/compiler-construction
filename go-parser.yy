@@ -99,14 +99,14 @@ unit: 				package_clause import_clause top_level_declaration{
 
 package_clause:		PACKAGE ID SEMICOLON{
 					Node *tmp = new Node("package_clause");
-					tmp->addChild(new Node("id"));
+					tmp->addChild(new Node("id", driver.addToSymbolTable($2)));
 					$$ = tmp;
 };
 
 import_clause:		%empty {$$ = nullptr;}
 					|IMPORT LITSTRING SEMICOLON import_clause{
 						Node *tmp = new Node("import_clause");
-						tmp->addChild(new Node("litString"));
+						tmp->addChild(new Node("litString", driver.addToSymbolTable($2)));
 						tmp->addChild($4);
 						$$ = tmp;
 					}
@@ -120,7 +120,7 @@ import_clause:		%empty {$$ = nullptr;}
 import_list_entry:	%empty {$$ = nullptr;}
 					|LITSTRING SEMICOLON import_list_entry{
 						Node *tmp = new Node("import_list_entry");
-						tmp->addChild(new Node("litString"));
+						tmp->addChild(new Node("litString", driver.addToSymbolTable($1)));
 						tmp->addChild($3);
 						$$ = tmp;
 						};
@@ -140,13 +140,13 @@ top_level_declaration:	%empty {$$ = nullptr;}
 					};
 var_declaration:	VAR ID type SEMICOLON{
 						Node *tmp = new Node("var_declaration");
-						tmp->addChild(new Node("id"));
+						tmp->addChild(new Node("id", driver.addToSymbolTable($2)));
 						tmp->addChild($3);
 						$$ = tmp;
 					};
 func_declaration:	FUNC ID PARL para_signature PARR return_signature CURL statement_list CURR{ 
 						Node *tmp = new Node("func_declaration");
-						tmp->addChild(new Node("id"));
+						tmp->addChild(new Node("id", driver.addToSymbolTable($2)));
 						tmp->addChild($4);
 						tmp->addChild($6);
 						tmp->addChild($8);
@@ -171,19 +171,19 @@ statement_list:		%empty {$$ = nullptr;}
 					
 expression:			function_call SEMICOLON{
 						Node *tmp = new Node("expression");
-						tmp->addChild(new Node("id"));
 						tmp->addChild($1);
 						$$ = tmp;
 					}
 					|ID EQUALS exp SEMICOLON{
 						Node *tmp = new Node("expression");
-						tmp->addChild(new Node("id"));
+						tmp->addChild(new Node("id", driver.addToSymbolTable($1)));
 						tmp->addChild($3);
 						$$ = tmp;
 					};
 function_call:		ID DOT ID PARL parameter_list PARR{
 						Node *tmp = new Node("function_call");
-						tmp->addChild(new Node("id"));
+						tmp->addChild(new Node("id", driver.addToSymbolTable($1)));
+						tmp->addChild(new Node("id", driver.addToSymbolTable($3)));
 						tmp->addChild($5);
 						$$ = tmp;
 					};
@@ -220,7 +220,7 @@ exp:				exp PLUS exp   {
 						tmp->addChild($2);
 						$$ = tmp;
 					}
-					| ID  { $$ = new Node("id"); }
+					| ID  { $$ = new Node("id", driver.addToSymbolTable($1)); }
 					| lit  {
 						$$ = $1;
 					}
@@ -228,19 +228,19 @@ exp:				exp PLUS exp   {
 						$$ = $1;
 					};
 lit:				LITINT{
-						$$ = new Node("int lit");
+						$$ = new Node("int lit", driver.addToSymbolTable($1));
 					}
 					|LITFLOAT{
-						$$ = new Node("float lit");
+						$$ = new Node("float lit", driver.addToSymbolTable($1));
 					}
 					|LITRUNE{
-						$$ = new Node("rune lit");
+						$$ = new Node("rune lit", driver.addToSymbolTable($1));
 					}
 					|LITBOOL{
-						$$ = new Node("bool lit");
+						$$ = new Node("bool lit", driver.addToSymbolTable($1));
 					}
 					|LITSTRING{
-						$$ = new Node("string lit");
+						$$ = new Node("string lit", driver.addToSymbolTable($1));
 					};
 type:				TYPEINT{
 						$$ = new Node("int");
@@ -263,4 +263,5 @@ void yy::go_parser::error (const location_type& l,
                           const std::string& m)
 {
   driver.error (l, m);
+  exit(42);
 }
