@@ -18,26 +18,28 @@
 # $^ = The names of all the prerequisites, with spaces between them.
 ####################################################################
 # Uncomment only one of the next two lines (choose your c++ compiler)
-# CC=g++
-CC=clang++
+CXX=g++
+#CXX=clang++
 
 LEX=flex
 YACC=bison
 YFLAGS=-v -d
+CPPFLAGS= -g -std=c++11 `llvm-config --ldflags --system-libs --libs core`
 # Wo   -d wichtig ist, weil damit Header-Dateien erzeugt werden
 #         (*.hh - und nicht nur Quellcode in *.cc)
 # aber -v nicht so wichtig ist, weil damit "nur" die  Datei
 #         go-parser.output erzeugt wird, die zwar informativ aber nicht
 #         unbedingt notwendig (sie wird nicht weiterverwendet).
+LLVM-DEPENDENT=Node.cc AST_Node.cc go.cc go-driver.cc go-scanner.cc
 
 HEADERS=go-parser.hh go-scanner.hh
 
 #go : go.o go-scanner.o go-parser.o go-driver.o
-
-go : go.cc go-driver.cc go-parser.cc go-scanner.cc Node.cc
+$(LLVM-DEPENDENT):EXTRA_FLAGS=`llvm-config --cxxflags --ldflags --system-libs --libs core`
+go :  go-parser.cc  $(LLVM-DEPENDENT)
 
 %.o: %.cc
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(CXX) $(CPPFLAGS) $(EXTRA_FLAGS) -o $@ -c $<
 
 go-scanner.cc: go-scanner.ll
 	$(LEX) $(LFLAGS) -o go-scanner.cc go-scanner.ll
