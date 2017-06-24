@@ -24,14 +24,19 @@
 
 using namespace llvm;
 class Node{
-private:
+protected:
 	std::vector<Node*>* children;
 public:
 	static std::vector<std::string> *symbolTable;
+	
+	static LLVMContext TheContext;
+	static std::unique_ptr<Module> TheModule;
+		
 	Node();
 	Node(std::string val);
 	Node(std::string val, unsigned int symTabIndex);
 	std::string val;
+	Node* getChild(int pos);
 	int symTabIndex;
 	void addChild(Node* child);
 	void print(int depth);

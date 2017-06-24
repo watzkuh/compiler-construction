@@ -15,6 +15,9 @@ Node::Node(std::string val, unsigned int symTabIndex){
 	this->symTabIndex = symTabIndex;
 	children = new std::vector<Node*>;
 }
+Node* Node::getChild(int pos){
+		return (*children)[pos];
+}
 void Node::addChild(Node *child){
 	if(child != nullptr){
 		children->push_back(child);
@@ -31,10 +34,8 @@ void Node::print(int depth) {
 	std::cout<<std::endl;
 	
 	for(auto c = children->begin(); c != children->end(); ++c){
-		if(*c){
+		if(*c != nullptr){
 			(*c)->print(depth+1);
 		}
     }
 }
-
-

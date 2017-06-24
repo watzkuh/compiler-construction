@@ -24,7 +24,7 @@ CXX=g++
 LEX=flex
 YACC=bison
 YFLAGS=-v -d
-CPPFLAGS= -g -std=c++11 `llvm-config --ldflags --system-libs --libs core`
+CPPFLAGS= -g -std=c++11 `llvm-config --ldflags --system-libs --libs core` 
 # Wo   -d wichtig ist, weil damit Header-Dateien erzeugt werden
 #         (*.hh - und nicht nur Quellcode in *.cc)
 # aber -v nicht so wichtig ist, weil damit "nur" die  Datei

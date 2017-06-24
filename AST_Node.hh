@@ -8,6 +8,12 @@ class AST_Node : public Node{
 	AST_Node(std::string val, unsigned int symTabIndex) : Node(val, symTabIndex){};
 	Value *genCode() override;
 };
+
+class IdNode : public Node{
+	public:
+	IdNode(std::string val, unsigned int symTabIndex) : Node(val, symTabIndex){};
+	Value *genCode() override;
+};
 class TypeNode : public Node{
 	public:
 	TypeNode(std::string val) : Node(val){};
@@ -16,6 +22,11 @@ class TypeNode : public Node{
 class LitNode : public Node{
 	public:
 	LitNode(std::string val, unsigned int symTabIndex) : Node(val, symTabIndex){};
+	Value *genCode() override;
+};
+class ExpNode : public Node{
+	public:
+	ExpNode(std::string val) : Node(val){};
 	Value *genCode() override;
 };
 

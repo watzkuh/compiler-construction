@@ -101,14 +101,14 @@ unit: 				package_clause import_clause top_level_declaration{
 
 package_clause:		PACKAGE ID SEMICOLON{
 					Node *tmp = new AST_Node("package_clause");
-					tmp->addChild(new AST_Node("id", driver.addToSymbolTable($2)));
+					tmp->addChild(new IdNode("id", driver.addToSymbolTable($2)));
 					$$ = tmp;
 };
 
 import_clause:		%empty {$$ = nullptr;}
 					|IMPORT LITSTRING SEMICOLON import_clause{
 						Node *tmp = new AST_Node("import_clause");
-						tmp->addChild(new AST_Node("litString", driver.addToSymbolTable($2)));
+						tmp->addChild(new LitNode("string lit", driver.addToSymbolTable($2)));
 						tmp->addChild($4);
 						$$ = tmp;
 					}
@@ -122,7 +122,7 @@ import_clause:		%empty {$$ = nullptr;}
 import_list_entry:	%empty {$$ = nullptr;}
 					|LITSTRING SEMICOLON import_list_entry{
 						Node *tmp = new AST_Node("import_list_entry");
-						tmp->addChild(new AST_Node("litString", driver.addToSymbolTable($1)));
+						tmp->addChild(new LitNode("string lit", driver.addToSymbolTable($1)));
 						tmp->addChild($3);
 						$$ = tmp;
 						};
@@ -142,13 +142,13 @@ top_level_declaration:	%empty {$$ = nullptr;}
 					};
 var_declaration:	VAR ID type SEMICOLON{
 						Node *tmp = new AST_Node("var_declaration");
-						tmp->addChild(new AST_Node("id", driver.addToSymbolTable($2)));
+						tmp->addChild(new IdNode("id", driver.addToSymbolTable($2)));
 						tmp->addChild($3);
 						$$ = tmp;
 					};
 func_declaration:	FUNC ID PARL para_signature PARR return_signature CURL statement_list CURR{ 
 						Node *tmp = new AST_Node("func_declaration");
-						tmp->addChild(new AST_Node("id", driver.addToSymbolTable($2)));
+						tmp->addChild(new IdNode("id", driver.addToSymbolTable($2)));
 						tmp->addChild($4);
 						tmp->addChild($6);
 						tmp->addChild($8);
@@ -178,15 +178,21 @@ expression:			function_call SEMICOLON{
 					}
 					|ID EQUALS exp SEMICOLON{
 						Node *tmp = new AST_Node("expression");
-						tmp->addChild(new AST_Node("id", driver.addToSymbolTable($1)));
+						tmp->addChild(new IdNode("id", driver.addToSymbolTable($1)));
 						tmp->addChild($3);
 						$$ = tmp;
 					};
 function_call:		ID DOT ID PARL parameter_list PARR{
 						Node *tmp = new AST_Node("function_call");
-						tmp->addChild(new AST_Node("id", driver.addToSymbolTable($1)));
-						tmp->addChild(new AST_Node("id", driver.addToSymbolTable($3)));
+						tmp->addChild(new IdNode("id", driver.addToSymbolTable($1)));
+						tmp->addChild(new IdNode("id", driver.addToSymbolTable($3)));
 						tmp->addChild($5);
+						$$ = tmp;
+					}
+					| ID PARL parameter_list PARR{
+						Node *tmp = new AST_Node("function_call");
+						tmp->addChild(new IdNode("id", driver.addToSymbolTable($1)));
+						tmp->addChild($3);
 						$$ = tmp;
 					};
 parameter_list:		%empty{$$ = nullptr;}
@@ -194,36 +200,36 @@ parameter_list:		%empty{$$ = nullptr;}
 					|exp;
 
 exp:				exp PLUS exp   { 
-						Node *tmp = new AST_Node("addition");
+						Node *tmp = new ExpNode("addition");
 						tmp->addChild($1);
 						tmp->addChild($3);
 						$$ = tmp;
 					}
 					| exp MINUS exp   {
-						Node *tmp = new AST_Node("subtraction");
+						Node *tmp = new ExpNode("subtraction");
 						tmp->addChild($1);
 						tmp->addChild($3);
 						$$ = tmp;
 					}
 					| exp MUL exp   { 
-						Node *tmp = new AST_Node("multiplication");
+						Node *tmp = new ExpNode("multiplication");
 						tmp->addChild($1);
 						tmp->addChild($3);
 						$$ = tmp ;
 					}
 					| exp DIV exp   {
-						Node *tmp = new AST_Node("division");
+						Node *tmp = new ExpNode("division");
 						tmp->addChild($1);
 						tmp->addChild($3);
 						$$ = tmp;
 					}
 					| PARL exp PARR   { 
-						Node *tmp = new AST_Node("sub exp");
-						tmp->addChild($2);
-						$$ = tmp;
+						$$ = $2;
 					}
-					| ID  { $$ = new AST_Node("id", driver.addToSymbolTable($1)); }
+					| ID  { $$ = new IdNode("id", driver.addToSymbolTable($1)); }
 					| lit  {
+						Node *tmp = new ExpNode("sub exp");
+						tmp->addChild($1);
 						$$ = $1;
 					}
 					|function_call{
