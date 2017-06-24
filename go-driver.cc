@@ -3,7 +3,6 @@
 #include "Node.hh"
 
 std::vector<std::string> *Node::symbolTable;
-LLVMContext Node::TheContext;
 std::unique_ptr<Module> Node::TheModule;
 
 go_driver::go_driver ()
@@ -11,7 +10,6 @@ go_driver::go_driver ()
 {
    this->symbolTable = new std::vector<std::string>;
    Node::symbolTable = this->symbolTable;
-   Node::TheModule = llvm::make_unique<llvm::Module>("go", Node::TheContext);
 }
 
 go_driver::~go_driver ()

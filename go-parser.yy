@@ -92,7 +92,7 @@ function_call exp parameter_list lit
 %%
 %start unit;
 unit: 				package_clause import_clause top_level_declaration{
-					Node *tmp = new AST_Node("sourcefile");
+					Node *tmp = new StartNode("sourcefile");
 					tmp->addChild($1);
 					tmp->addChild($2);
 					tmp->addChild($3);

@@ -1,4 +1,6 @@
 #include "AST_Node.hh"
+using namespace llvm;
+LLVMContext Node::TheContext;
 static IRBuilder<> Builder(Node::TheContext);
 Value *AST_Node::genCode(){
 	for(auto c = children->begin(); c != children->end(); ++c){
@@ -7,7 +9,14 @@ Value *AST_Node::genCode(){
 		}
     }
 }
-
+Value *StartNode::genCode(){
+	Node::TheModule = llvm::make_unique<llvm::Module>("go", Node::TheContext);
+	for(auto c = children->begin(); c != children->end(); ++c){
+		if(*c != nullptr){
+			(*c)->genCode();
+		}
+    }
+}
 Value *IdNode::genCode(){
 	auto ref = ArrayRef<unsigned char>((unsigned char*)(*Node::symbolTable)[this->symTabIndex].c_str(), (*Node::symbolTable)[this->symTabIndex].length());
 	auto* v = ConstantDataArray::get(Node::TheContext, ref);
@@ -22,7 +31,9 @@ Value *LitNode::genCode(){
 		return ConstantInt::get(Node::TheContext, APInt(32, std::atoi((*Node::symbolTable)[this->symTabIndex].c_str()), true));
 	}
 	else if(this->val == "float lit"){
-		return ConstantFP::get(Node::TheContext, APFloat(std::atof((*Node::symbolTable)[this->symTabIndex].c_str())));
+		auto a = ConstantFP::get(Node::TheContext, APFloat(std::atof((*Node::symbolTable)[this->symTabIndex].c_str())));
+		a->dump();
+		return a;
 	}
 	else if(this->val == "bool lit"){
 		

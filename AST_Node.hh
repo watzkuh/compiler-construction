@@ -8,7 +8,11 @@ class AST_Node : public Node{
 	AST_Node(std::string val, unsigned int symTabIndex) : Node(val, symTabIndex){};
 	Value *genCode() override;
 };
-
+class StartNode : public Node{
+	public:
+	StartNode(std::string val) : Node(val){};
+	Value *genCode() override;
+};
 class IdNode : public Node{
 	public:
 	IdNode(std::string val, unsigned int symTabIndex) : Node(val, symTabIndex){};
