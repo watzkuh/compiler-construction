@@ -18,8 +18,8 @@
 # $^ = The names of all the prerequisites, with spaces between them.
 ####################################################################
 # Uncomment only one of the next two lines (choose your c++ compiler)
-CXX=g++
-#CXX=clang++
+#CXX=g++
+CXX=clang++
 
 LEX=flex
 YACC=bison

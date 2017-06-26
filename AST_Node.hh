@@ -1,7 +1,7 @@
 #ifndef AST_NODE_HH
 #define AST_NODE_HH
 #include "Node.hh"
-
+using namespace llvm;
 class AST_Node : public Node{
 	public:
 	AST_Node(std::string val) : Node(val){};

@@ -3,19 +3,25 @@ using namespace llvm;
 LLVMContext Node::TheContext;
 static IRBuilder<> Builder(Node::TheContext);
 Value *AST_Node::genCode(){
+	std::vector<llvm::Value*>ssa;
 	for(auto c = children->begin(); c != children->end(); ++c){
 		if(*c != nullptr){
-			(*c)->genCode();
+			ssa.push_back((*c)->genCode());
 		}
     }
+	//just use one of the nodes for testing reasons, we didn't really find a way to just append llvm IR
+	return ssa[0];
 }
 Value *StartNode::genCode(){
-	Node::TheModule = llvm::make_unique<llvm::Module>("go", Node::TheContext);
-	for(auto c = children->begin(); c != children->end(); ++c){
+	Node::TheModule = llvm::make_unique<Module>("go", Node::TheContext);
+	//skip package name and imports
+	return this->getChild(2)->genCode();
+	/*for(auto c = children->begin(); c != children->end(); ++c){
 		if(*c != nullptr){
-			(*c)->genCode();
+			return (*c)->genCode();
 		}
     }
+	return nullptr;*/
 }
 Value *IdNode::genCode(){
 	auto ref = ArrayRef<unsigned char>((unsigned char*)(*Node::symbolTable)[this->symTabIndex].c_str(), (*Node::symbolTable)[this->symTabIndex].length());
@@ -24,7 +30,7 @@ Value *IdNode::genCode(){
 	return v;
 }
 Value *TypeNode::genCode(){
-	
+	return nullptr;
 }
 Value *LitNode::genCode(){
 	if(this->val == "int lit"){
@@ -32,14 +38,14 @@ Value *LitNode::genCode(){
 	}
 	else if(this->val == "float lit"){
 		auto a = ConstantFP::get(Node::TheContext, APFloat(std::atof((*Node::symbolTable)[this->symTabIndex].c_str())));
-		a->dump();
+		//a->dump();
 		return a;
 	}
 	else if(this->val == "bool lit"){
-		
+		return nullptr;
 	}
 	else if(this->val == "rune lit"){
-		
+		return nullptr;
 	}
 	else if(this->val == "string lit"){
 		auto ref = ArrayRef<unsigned char>((unsigned char*)(*Node::symbolTable)[this->symTabIndex].c_str(), (*Node::symbolTable)[this->symTabIndex].length());
@@ -47,6 +53,7 @@ Value *LitNode::genCode(){
 	}
 	else{
 		std::cout<<"error: "<<this->val<<" does not match LitNode"<<std::endl;
+		return nullptr;
 	}
 }
 Value *ExpNode::genCode(){
@@ -56,7 +63,7 @@ Value *ExpNode::genCode(){
 		return nullptr;
 	if(this->val == "addition"){
 		auto* a = Builder.CreateAdd(L, R, "addtmp");
-		a->dump();
+		//a->dump();
 		return a;
 	}
 	else if(this->val == "subtraction"){
@@ -67,7 +74,7 @@ Value *ExpNode::genCode(){
 	}
 	else if(this->val == "division"){
 		auto* a = Builder.CreateUDiv(L, R, "divtmp");
-		a->dump();
+		//a->dump();
 		return a;
 	}
 	else if(this->val == "sub exp"){
@@ -75,5 +82,6 @@ Value *ExpNode::genCode(){
 	}
 	else{
 		std::cout<<"error: "<<this->val<<" does not match ExpNode"<<std::endl;
+		return nullptr;
 	}
 }

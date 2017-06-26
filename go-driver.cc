@@ -35,9 +35,13 @@ go_driver::parse (const std::string &f)
   int res = parser.parse();
   scan_end ();
   if(this->root != nullptr){
-	this->root->print(0);
-	this->root->genCode();
+	//print AST
+	//this->root->print(0);
+	auto *c = this->root->genCode();
+	//dealing directly with the returned llvm:Values works
+	c->dump();
   }
+  //Is always empty, besides the name
   Node::TheModule->dump();
   return res;
 }
